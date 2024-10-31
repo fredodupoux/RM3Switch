@@ -1,2 +1,3 @@
 # RM3Switch
- A device to control two generators and two other devices.
+ A device connected to the Blynk IO platform.
+ Made to control a power generator with power input monitoring and scheduled timers to trigger relays.
