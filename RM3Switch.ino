@@ -74,7 +74,7 @@ float meterTime2;
 #include "HourMeter.h"
 #include "SwitchLogic.h"
 #include "GridMonitor.h"
-#include "ScheduleTime.h"
+#include "ScheduledTimers.h"
 #include "Debugging.h"
 #include "VoltMeter.h"
 
@@ -193,9 +193,24 @@ void stopGenSet() {
   genSet.stop();
   Terminal.println(local.dateTime());
   checkPowerOutput.detach();
-  if (isScheduleOn) {
-    isScheduleOn = false;
-  }
+  // if (isScheduleOn) {
+  //   isScheduleOn = false;
+  // }
+}
+void startTransmitter() {
+  transmitter.start();
+}
+
+void stopTransmitter() {
+  transmitter.stop();
+}
+
+void startCamera() {
+  camera.start();
+}
+
+void stopCamera() {
+  camera.stop();
 }
 
 void restoreState() {
@@ -252,8 +267,10 @@ void setup() {
   ArduinoOTA.setPassword((const char *)"pafoutmanyen");
   ArduinoOTA.begin();
 
+    setupSchedules();
+
   //schedules
-  timer.setInterval(120000, checkSchedule);  // Check alarms every 2min
+  timer.setInterval(30000, checkAllSchedules);  // Check alarms every 30sec
   //send data to blynk
   timer.setInterval(60000L, sendData);  // Every 60sec push Voltage to V3
 }

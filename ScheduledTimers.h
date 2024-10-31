@@ -1,121 +1,121 @@
 #include <ezTime.h>
 
-// Structure to hold timer settings
-struct Timer {
+// Structure to hold schedule settings
+struct Schedule {
     int startHour;
     int startMinute;
     int stopHour;
     int stopMinute;
     int days[7];
     bool isScheduleDay;
-    bool isScheduleOn;
+    bool isActive;
     void (*startFunction)();
     void (*stopFunction)();
-    int blynkVPin;  // Virtual pin number for this timer
+    int blynkVPin;  // Virtual pin number for this schedule
 };
 
 Timezone local;
 
-// Define your timer instances
-Timer genSetTimer = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V1};
-Timer pumpTimer = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V2};
-Timer lightTimer = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V3};
+// Define your schedule instances
+Schedule genSetSchedule = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V1};
+Schedule transmitterSchedule = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V2};
+Schedule cameraSchedule = {0, 0, 0, 0, {0}, false, false, nullptr, nullptr, V3};
 
 // Function declarations
 void startGenSet();
 void stopGenSet();
-void startPump();
-void stopPump();
-void startLight();
-void stopLight();
+void startTransmitter();
+void stopTransmitter();
+void startCamera();
+void stopCamera();
 
-void setupTimers() {
-    // Initialize timer functions
-    genSetTimer.startFunction = startGenSet;
-    genSetTimer.stopFunction = stopGenSet;
+void setupSchedules() {
+    // Initialize schedule functions
+    genSetSchedule.startFunction = startGenSet;
+    genSetSchedule.stopFunction = stopGenSet;
     
-    pumpTimer.startFunction = startPump;
-    pumpTimer.stopFunction = stopPump;
+    transmitterSchedule.startFunction = startTransmitter;
+    transmitterSchedule.stopFunction = stopTransmitter;
     
-    lightTimer.startFunction = startLight;
-    lightTimer.stopFunction = stopLight;
+    cameraSchedule.startFunction = startCamera;
+    cameraSchedule.stopFunction = stopCamera;
 }
 
-// Generic function to process timer settings
-void processTimerSettings(Timer& timer, TimeInputParam t) {
+// Generic function to process schedule settings
+void processScheduleSettings(Schedule& schedule, TimeInputParam t) {
     if (t.hasStartTime()) {
-        timer.startHour = t.getStartHour();
-        timer.startMinute = t.getStartMinute();
-        Terminal.println(String("Start: ") + timer.startHour + ":" + timer.startMinute);
+        schedule.startHour = t.getStartHour();
+        schedule.startMinute = t.getStartMinute();
+        Terminal.println(String("Start: ") + schedule.startHour + ":" + schedule.startMinute);
     }
 
     if (t.hasStopTime()) {
-        timer.stopHour = t.getStopHour();
-        timer.stopMinute = t.getStopMinute();
-        Terminal.println(String("Stop: ") + timer.stopHour + ":" + timer.stopMinute);
+        schedule.stopHour = t.getStopHour();
+        schedule.stopMinute = t.getStopMinute();
+        Terminal.println(String("Stop: ") + schedule.stopHour + ":" + schedule.stopMinute);
     }
 
     // Process weekdays
     for (int i = 1; i <= 7; i++) {
-        timer.days[i-1] = t.isWeekdaySelected(i) ? i : 0;
+        schedule.days[i-1] = t.isWeekdaySelected(i) ? i : 0;
         if (t.isWeekdaySelected(i)) {
             Terminal.println(String("Day ") + i + " is selected");
         }
     }
 }
 
-// Blynk write handlers for each timer
-BLYNK_WRITE(V1) {  // GenSet Timer
+// Blynk write handlers for each schedule
+BLYNK_WRITE(V1) {  // GenSet Schedule
     TimeInputParam t(param);
-    processTimerSettings(genSetTimer, t);
+    processScheduleSettings(genSetSchedule, t);
 }
 
-BLYNK_WRITE(V2) {  // Pump Timer
+BLYNK_WRITE(V2) {  // Pump Schedule
     TimeInputParam t(param);
-    processTimerSettings(pumpTimer, t);
+    processScheduleSettings(transmitterSchedule, t);
 }
 
-BLYNK_WRITE(V3) {  // Light Timer
+BLYNK_WRITE(V3) {  // Light Schedule
     TimeInputParam t(param);
-    processTimerSettings(lightTimer, t);
+    processScheduleSettings(cameraSchedule, t);
 }
 
-// Generic function to check timer schedule
-void checkTimerSchedule(Timer& timer) {
-    timer.isScheduleDay = false;
+// Generic function to check schedule
+void checkSchedule(Schedule& schedule) {
+    schedule.isScheduleDay = false;
     
     // Check if today is a scheduled day
     for (int i = 0; i < 7; i++) {
-        if (timer.days[i] == local.weekday()) {
-            timer.isScheduleDay = true;
+        if (schedule.days[i] == local.weekday()) {
+            schedule.isScheduleDay = true;
             break;
         }
     }
 
     // Check start time
-    if (!timer.isScheduleOn && timer.isScheduleDay && 
-        local.hour() == timer.startHour && local.minute() == timer.startMinute) {
-        timer.isScheduleOn = true;
-        if (timer.startFunction != nullptr) {
-            timer.startFunction();
+    if (!schedule.isActive && schedule.isScheduleDay && 
+        local.hour() == schedule.startHour && local.minute() == schedule.startMinute) {
+        schedule.isActive = true;
+        if (schedule.startFunction != nullptr) {
+            schedule.startFunction();
         }
     }
 
     // Check stop time
-    if (timer.isScheduleOn && timer.isScheduleDay && 
-        local.hour() == timer.stopHour && local.minute() == timer.stopMinute) {
-        timer.isScheduleOn = false;
-        if (timer.stopFunction != nullptr) {
-            timer.stopFunction();
+    if (schedule.isActive && schedule.isScheduleDay && 
+        local.hour() == schedule.stopHour && local.minute() == schedule.stopMinute) {
+        schedule.isActive = false;
+        if (schedule.stopFunction != nullptr) {
+            schedule.stopFunction();
         }
     }
 }
 
-// Function to check all timer schedules
+// Function to check all schedules
 void checkAllSchedules() {
-    checkTimerSchedule(genSetTimer);
-    checkTimerSchedule(pumpTimer);
-    checkTimerSchedule(lightTimer);
+    checkSchedule(genSetSchedule);
+    checkSchedule(transmitterSchedule);
+    checkSchedule(cameraSchedule);
 }
 
 // UTC time handler (unchanged)
