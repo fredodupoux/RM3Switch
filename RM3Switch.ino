@@ -1,30 +1,3 @@
-/*
-
-Power Source 1 LED  V6
-Power Source 1 LED  V7
-
-Physical Relay 1    D1
-Physical Relay 2    D2
-Physical Relay 3    D5
-
-Source 1 input      D6
-Source 2 input      D7
-
-Relay vButton 1     V16
-Relay vButton 2     V17
-Relay vButton 3     V18
-
-Calibrate Input1    V36
-Calibrate Button1   V37
-Calibrate Voltage   V38
-Calibrate Button2   V39
-
-Last Run Widget     V40
-Meter 1 Widget      V41
-Meter 2 Widget      V42
-
-*/
-
 #include "KeysAndSetup.h" // Blynk setup, token and template ID, Hostanme, OTA and WiFi keys
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -221,7 +194,7 @@ void restoreState() {
 
 void sendData() {
   Blynk.virtualWrite(V26, WiFi.RSSI());
-  measureVoltage();
+  getVoltage();
 
   // update timer values on server if a source is active.
   if (!powerSource1.getState()) {
