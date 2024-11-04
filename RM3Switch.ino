@@ -25,13 +25,7 @@ Meter 2 Widget      V42
 
 */
 
-#define BLYNK_PRINT Serial  // Comment this out to disable prints and save space
-#define BLYNK_TEMPLATE_ID "TMPL2kJc-C4SU"
-#define BLYNK_TEMPLATE_NAME "GenSet  Monitor"
-// #define BLYNK_AUTH_TOKEN "Y6f8yvYwzeBCoRyCnG4rr94djEogVxbn"  //test device
-#define BLYNK_AUTH_TOKEN "fHKcU6whahnmGrIuSSHdF_EuD2tLJhYg" // metropole
-#define BLYNK_FIRMWARE_VERSION "1.3"
-
+#include "KeysAndSetup.h" // Blynk setup, token and template ID, Hostanme, OTA and WiFi keys
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 #include <ArduinoOTA.h>
@@ -78,17 +72,11 @@ float meterTime2;
 #include "Debugging.h"
 #include "VoltMeter.h"
 
-// your wifi settings
+// Your wifi settings
+char ssid[] = YOUR_SSID;
+char pass[] = YOUR_WIFI_PASSWORD;
 // char deviceHostName[] = "Power & Monitoring";
-char deviceHostName[] = "RM - Power";
-
-// char ssid[] = "((( Bat Radar )))";
-// char pass[] = "blakawouttotal1";
-char ssid[] = "Mabouya Net";
-char pass[] = "dansekonmabouya!";
-// char ssid[] = "ZTE_2.4G_Qk2fse";
-// char pass[] = "ah4Jww9N";
-// P05612776 - 34512493
+char deviceHostName[] = DEVICE_HOSTNAME;
 
 SwitchLogic genSet(RELAY_1, VBUTTON_1, "genSet");
 SwitchLogic transmitter(RELAY_2, VBUTTON_2, "transmitter");
@@ -264,13 +252,13 @@ void setup() {
 
   // OTA
   ArduinoOTA.setHostname(deviceHostName);
-  ArduinoOTA.setPassword((const char *)"pafoutmanyen");
+  ArduinoOTA.setPassword(OTA_PASSWORD);
   ArduinoOTA.begin();
 
     setupSchedules();
 
   //schedules
-  timer.setInterval(30000, checkAllSchedules);  // Check alarms every 30sec
+  timer.setInterval(15000, checkAllSchedules);  // Check alarms every 30sec
   //send data to blynk
   timer.setInterval(60000L, sendData);  // Every 60sec push Voltage to V3
 }
