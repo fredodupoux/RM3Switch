@@ -3,6 +3,7 @@
  Made to control a power generator with power input monitoring and scheduled timers to trigger relays.
 
 -- Device Setup -- 
+
 A Wemos D1 Mini
 2 Optocouplers for power source input monitoring.
 3 5v Relays

@@ -36,7 +36,7 @@ int batteryPercent() {
   return voltageMap(batteryVoltage(), 10.50, 12.70, 0, 100);
 }
 
-void getVoltage() {
-    Blynk.virtualWrite(V43, batteryVoltage());
-    Blynk.virtualWrite(V44, batteryPercent());
-  }
+// void getVoltage() {
+//     Blynk.virtualWrite(V43, batteryVoltage());
+//     Blynk.virtualWrite(V44, batteryPercent());
+//   }

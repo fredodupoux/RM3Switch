@@ -194,7 +194,9 @@ void restoreState() {
 
 void sendData() {
   Blynk.virtualWrite(V26, WiFi.RSSI());
-  getVoltage();
+  Blynk.virtualWrite(V43, batteryVoltage());
+  Blynk.virtualWrite(V44, batteryPercent());
+  // getVoltage();
 
   // update timer values on server if a source is active.
   if (!powerSource1.getState()) {
